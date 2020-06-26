@@ -311,17 +311,15 @@ describe('node feature', () => {
     expect(result.status).to.equal(0);
   });
 
-  ifit(features.isRunAsNodeEnabled())('handles Promise timeouts correctly', (done) => {
+  ifit(features.isRunAsNodeEnabled())('handles Promise timeouts correctly', async () => {
     const scriptPath = path.join(fixtures, 'module', 'node-promise-timer.js');
     const child = childProcess.spawn(process.execPath, [scriptPath], {
       env: { ELECTRON_RUN_AS_NODE: 'true' }
     });
-    emittedOnce(child, 'exit').then(([code, signal]) => {
-      expect(code).to.equal(0);
-      expect(signal).to.equal(null);
-      child.kill();
-      done();
-    });
+    const [code, signal] = await emittedOnce(child, 'exit');
+    expect(code).to.equal(0);
+    expect(signal).to.equal(null);
+    child.kill();
   });
 
   it('performs microtask checkpoint correctly', (done) => {

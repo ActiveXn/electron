@@ -415,18 +415,15 @@ describe('<webview> tag', function () {
       await emittedOnce(app, 'browser-window-created');
     });
 
-    it('emits a web-contents-created event', (done) => {
-      app.on('web-contents-created', function listener (event, contents) {
-        if (contents.getType() === 'window') {
-          app.removeListener('web-contents-created', listener);
-          done();
-        }
-      });
+    it('emits a web-contents-created event', async () => {
       loadWebView(w.webContents, {
         allowpopups: 'on',
         webpreferences: 'nativeWindowOpen=1',
         src: `file://${fixtures}/pages/window-open.html`
       });
+
+      const [, contents] = await emittedOnce(app, 'web-contents-created');
+      expect(contents.getType()).to.equal('window');
     });
   });
 

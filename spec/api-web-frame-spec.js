@@ -39,48 +39,36 @@ describe('webFrame module', function () {
       childFrameElement.remove();
     });
 
-    it('executeJavaScript() yields results via a promise and a sync callback', done => {
+    it('executeJavaScript() yields results via a promise and a sync callback', async () => {
       let callbackResult, callbackError;
 
-      childFrame
+      const executeJavaScript = childFrame
         .executeJavaScript('1 + 1', (result, error) => {
           callbackResult = result;
           callbackError = error;
-        })
-        .then(
-          promiseResult => {
-            expect(promiseResult).to.equal(2);
-            done();
-          },
-          promiseError => {
-            done(promiseError);
-          }
-        );
+        });
 
       expect(callbackResult).to.equal(2);
       expect(callbackError).to.be.undefined();
+
+      const promiseResult = await executeJavaScript;
+      expect(promiseResult).to.equal(2);
     });
 
-    it('executeJavaScriptInIsolatedWorld() yields results via a promise and a sync callback', done => {
+    it('executeJavaScriptInIsolatedWorld() yields results via a promise and a sync callback', async () => {
       let callbackResult, callbackError;
 
-      childFrame
+      const executeJavaScriptInIsolatedWorld = childFrame
         .executeJavaScriptInIsolatedWorld(999, [{ code: '1 + 1' }], (result, error) => {
           callbackResult = result;
           callbackError = error;
-        })
-        .then(
-          promiseResult => {
-            expect(promiseResult).to.equal(2);
-            done();
-          },
-          promiseError => {
-            done(promiseError);
-          }
-        );
+        });
 
       expect(callbackResult).to.equal(2);
       expect(callbackError).to.be.undefined();
+
+      const promiseResult = await executeJavaScriptInIsolatedWorld;
+      expect(promiseResult).to.equal(2);
     });
 
     it('executeJavaScript() yields errors via a promise and a sync callback', done => {

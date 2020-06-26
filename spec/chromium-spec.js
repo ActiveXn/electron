@@ -8,6 +8,7 @@ const ChildProcess = require('child_process');
 const { ipcRenderer } = require('electron');
 const { emittedOnce } = require('./events-helpers');
 const { resolveGetters } = require('./expect-helpers');
+const { ifdescribe } = require('./spec-helpers');
 const features = process._linkedBinding('electron_common_features');
 
 /* Most of the APIs here don't use standard callbacks */
@@ -46,21 +47,11 @@ describe('chromium feature', () => {
     });
   });
 
-  describe('navigator.geolocation', () => {
-    before(function () {
-      if (!features.isFakeLocationProviderEnabled()) {
-        return this.skip();
-      }
-    });
-
-    it('returns position when permission is granted', (done) => {
-      navigator.geolocation.getCurrentPosition((position) => {
-        expect(position).to.have.a.property('coords');
-        expect(position).to.have.a.property('timestamp');
-        done();
-      }, (error) => {
-        done(error);
-      });
+  ifdescribe(features.isFakeLocationProviderEnabled())('navigator.geolocation', () => {
+    it('returns position when permission is granted', async () => {
+      const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject));
+      expect(position).to.have.a.property('coords');
+      expect(position).to.have.a.property('timestamp');
     });
   });
 
